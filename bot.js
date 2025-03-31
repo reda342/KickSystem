@@ -1,4 +1,4 @@
-// ✅ bot.js complet avec commande /bansb (Slap Battles)
+// ✅ bot.js avec commande /game (rejoindre le serveur d’un joueur)
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const axios = require('axios');
 
@@ -10,24 +10,16 @@ const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 
 const commands = [
   new SlashCommandBuilder().setName('user').setDescription('Voir les utilisateurs connectés'),
-
-  new SlashCommandBuilder().setName('kick').setDescription('Kick un joueur').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true)),
-
-  new SlashCommandBuilder().setName('mute').setDescription('Mute un joueur').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true)),
-
-  new SlashCommandBuilder().setName('unmute').setDescription('Unmute un joueur').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true)),
-
-  new SlashCommandBuilder().setName('freeze').setDescription('Freeze un joueur').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true)),
-
-  new SlashCommandBuilder().setName('unfreeze').setDescription('Unfreeze un joueur').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true)),
-
-  new SlashCommandBuilder().setName('notif').setDescription('Envoie une notification à un joueur').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true)).addStringOption(option => option.setName('text').setDescription('Texte de la notif').setRequired(true)),
-
-  new SlashCommandBuilder().setName('blacklist').setDescription('Blacklist un joueur (kick auto à chaque reco)').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true)),
-
-  new SlashCommandBuilder().setName('unblacklist').setDescription('Retire un joueur de la blacklist').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true)),
-
-  new SlashCommandBuilder().setName('bansb').setDescription('Ban SB (envoie script personnalisé)').addStringOption(option => option.setName('username').setDescription('Nom du joueur').setRequired(true))
+  new SlashCommandBuilder().setName('kick').setDescription('Kick un joueur').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)),
+  new SlashCommandBuilder().setName('mute').setDescription('Mute un joueur').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)),
+  new SlashCommandBuilder().setName('unmute').setDescription('Unmute un joueur').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)),
+  new SlashCommandBuilder().setName('freeze').setDescription('Freeze un joueur').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)),
+  new SlashCommandBuilder().setName('unfreeze').setDescription('Unfreeze un joueur').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)),
+  new SlashCommandBuilder().setName('notif').setDescription('Envoie une notification').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)).addStringOption(o => o.setName('text').setDescription('Texte de la notif').setRequired(true)),
+  new SlashCommandBuilder().setName('blacklist').setDescription('Blacklist un joueur').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)),
+  new SlashCommandBuilder().setName('unblacklist').setDescription('Retirer de la blacklist').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)),
+  new SlashCommandBuilder().setName('bansb').setDescription('Ban SB').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true)),
+  new SlashCommandBuilder().setName('game').setDescription('Obtenir le lien du jeu du joueur').addStringOption(o => o.setName('username').setDescription('Nom du joueur').setRequired(true))
 ];
 
 const rest = new REST({ version: '10' }).setToken(TOKEN);
@@ -74,6 +66,20 @@ client.on('interactionCreate', async interaction => {
       await interaction.reply(msg);
     } catch (err) {
       if (!interaction.replied) await interaction.reply('❌ Erreur serveur.');
+    }
+  }
+
+  if (interaction.commandName === 'game') {
+    try {
+      const res = await axios.get(`${API_URL}/gameinfo/${username}`);
+      const { placeId, jobId } = res.data;
+      const teleportCode = `game:GetService('TeleportService'):TeleportToPlaceInstance(${placeId}, "${jobId}", game.Players.LocalPlayer)`;
+      await interaction.reply(`🎮 **${username}** est dans le jeu:
+\`\`\`lua
+${teleportCode}
+\`\`\``);
+    } catch (err) {
+      await interaction.reply('❌ Impossible de récupérer le jeu du joueur.');
     }
   }
 });

@@ -3,7 +3,7 @@ const axios = require('axios');
 
 const TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = '1331382428987822180';
-const API_URL = 'http://192.168.1.51:3000';
+const API_URL = 'https://kicksystem.onrender.com';
 
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
 

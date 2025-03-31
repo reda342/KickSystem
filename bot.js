@@ -1,7 +1,7 @@
 const { Client, GatewayIntentBits, REST, Routes, SlashCommandBuilder } = require('discord.js');
 const axios = require('axios');
 
-const TOKEN = 'MTMzMTM4MjQyODk4NzgyMjE4MA.G-olBa.pW1W_RF00cKcZD6dTuqIlVs12YzVSRUhb6NRR8';
+const TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = '1331382428987822180';
 const API_URL = 'http://192.168.1.51:3000';
 
